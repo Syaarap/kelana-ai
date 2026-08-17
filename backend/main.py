@@ -1,9 +1,24 @@
+from fastapi import FastAPI
+
 from services.trip_service import (
     get_trip_category,
     get_travel_season,
     calculate_daily_budget,
     get_recommended_places,
 )
+
+
+app = FastAPI()
+
+
+@app.get("/api/v1/recommendations")
+def get_recommendations():
+    return ["Tokyo Tower", "Mount Fuji", "Shibuya"]
+
+
+@app.get("/api/v1/transportations")
+def get_transportations():
+    return ["Bus", "Train", "Flight"]
 
 
 def print_trip_summary(destination, days, budget, currency, travel_month):
@@ -24,20 +39,28 @@ def print_trip_summary(destination, days, budget, currency, travel_month):
     print(f"Season          : {season}")
     print()
     print("Recommended Places")
+
     for place in places:
         print(f"- {place}")
 
 
 def main():
     destination = input("Destination: ")
-    country = input("Country: ")   # tetap diminta sebagai input
+    country = input("Country: ")
     days = int(input("Days: "))
     budget = float(input("Budget: "))
     currency = input("Currency: ")
     travel_month = input("Travel Month: ")
 
     print()
-    print_trip_summary(destination, days, budget, currency, travel_month)
+
+    print_trip_summary(
+        destination,
+        days,
+        budget,
+        currency,
+        travel_month,
+    )
 
 
 if __name__ == "__main__":
