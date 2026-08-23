@@ -1,3 +1,4 @@
+from services.bedrock_service import generate_itinerary 
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -67,6 +68,42 @@ def create_trip(
     db.refresh(trip)
 
     return trip
+
+@app.post("/api/v1/trips/{id}/generate")
+def generate_trip_recommendation(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    trip = db.query(Trip).filter(Trip.id == id).first()
+
+    if trip is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Trip not found",
+        )
+
+    recommendation = generate_itinerary(
+        destination=trip.destination,
+        country=trip.country,
+        days=trip.days,
+        budget=trip.budget,
+        currency=trip.currency,
+        travel_month=trip.travel_month,
+        category=trip.category,
+        daily_budget=trip.daily_budget,
+        season=trip.season,
+    )
+
+    trip.ai_recommendation = recommendation
+
+    db.commit()
+    db.refresh(trip)
+
+    return {
+        "trip_id": trip.id,
+        "destination": trip.destination,
+        "ai_recommendation": trip.ai_recommendation,
+    }
 
 @app.put("/api/v1/trips/{id}", response_model=TripResponse)
 def update_trip(
