@@ -14,6 +14,7 @@ class Trip(Base):
     currency = Column(String, nullable=False)
     travel_month = Column(String, nullable=False)
     category = Column(String, nullable=False)
+    style = Column(String, nullable=False, default="Solo")
     daily_budget = Column(Float, nullable=False)
     season = Column(String, nullable=False)
     ai_recommendation = Column(Text, nullable=True)

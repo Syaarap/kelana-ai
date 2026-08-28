@@ -14,6 +14,7 @@ class TripResponse(BaseModel):
     currency: str
     travel_month: str
     category: str
+    style: str
     daily_budget: float
     season: str
 
