@@ -31,26 +31,26 @@ export default function TripCard({ trip }: TripCardProps) {
     Couple: "bg-pink-100 text-pink-700",
   };
 
- const destinationIcons: Record<string, string> = {
-  bandung: "🏔️",
-  bali: "🌴",
-  tokyo: "🗼",
-  jakarta: "🏙️",
-  yogyakarta: "🏛️",
-  singapore: "🌆",
-  default: "🌍",
-};
+  const destinationIcons: Record<string, string> = {
+    bandung: "🏔️",
+    bali: "🌴",
+    tokyo: "🗼",
+    jakarta: "🏙️",
+    yogyakarta: "🏛️",
+    singapore: "🌆",
+    default: "🌍",
+  };
 
- const icon =
-  destinationIcons[trip.destination.toLowerCase()] ||
-  destinationIcons.default;
+  const icon =
+    destinationIcons[trip.destination.toLowerCase()] ||
+    destinationIcons.default;
 
   const formattedBudget = `${trip.currency.toUpperCase()} ${new Intl.NumberFormat(
-  "en-US",
-  {
-    maximumFractionDigits: 0,
-  }
-).format(trip.budget)}`;
+    "en-US",
+    {
+      maximumFractionDigits: 0,
+    }
+  ).format(trip.budget)}`;
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -69,6 +69,10 @@ export default function TripCard({ trip }: TripCardProps) {
             <h2 className="text-2xl font-bold">
               {trip.destination}
             </h2>
+
+            <p className="text-sm text-blue-100">
+              {trip.country}
+            </p>
           </div>
         </div>
       </div>
@@ -119,8 +123,9 @@ export default function TripCard({ trip }: TripCardProps) {
         {/* Button */}
         <button
           type="button"
-           onClick={() => {
-    window.location.href = `/dashboard/${trip.id}`;}}
+          onClick={() => {
+            window.location.href = `/dashboard/trips/${trip.id}`;
+          }}
           className="mt-6 w-full rounded-xl border border-blue-600 px-4 py-3 text-sm font-semibold text-blue-600 transition hover:bg-blue-600 hover:text-white"
         >
           View Trip →
