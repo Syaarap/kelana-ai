@@ -1,6 +1,20 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       {/* Navbar */}
@@ -22,8 +36,11 @@ export default function Home() {
             </a>
           </div>
 
-          <button className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-            Get Started
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            Dashboard
           </button>
         </div>
       </nav>

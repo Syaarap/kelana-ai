@@ -43,9 +43,9 @@ export default function TripDetailPage() {
 
       console.log("TOKEN ADA:", !!token);
 
+      // Kalau belum login, langsung ke halaman login
       if (!token) {
-        setError("Belum login. Silakan login terlebih dahulu.");
-        setLoading(false);
+        router.push("/login");
         return;
       }
 
@@ -67,10 +67,10 @@ export default function TripDetailPage() {
 
         console.log("DATA TRIP:", data);
 
+        // Kalau token tidak valid / expired
         if (response.status === 401) {
           localStorage.removeItem("access_token");
-          setError("Session login sudah habis. Silakan login lagi.");
-          setLoading(false);
+          router.push("/login");
           return;
         }
 
@@ -90,7 +90,7 @@ export default function TripDetailPage() {
     };
 
     fetchTrip();
-  }, [params.id]);
+  }, [params.id, router]);
 
   if (loading) {
     return (
