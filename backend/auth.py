@@ -1,10 +1,11 @@
+import os
 from datetime import datetime, timedelta, timezone
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 
-SECRET_KEY = "kelana-ai-secret-key-change-this"
+SECRET_KEY = os.getenv("SECRET_KEY", "kelana-ai-local-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
