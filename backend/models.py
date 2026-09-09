@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from database import Base
 
@@ -12,6 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     trips = relationship("Trip", back_populates="user")
+    messages = relationship("ChatMessage", back_populates="user")
 
 
 class Trip(Base):
@@ -34,3 +36,27 @@ class Trip(Base):
     ai_recommendation = Column(Text, nullable=True)
 
     user = relationship("User", back_populates="trips")
+
+
+class ChatMessage(Base):
+    __tablename__ = "chat_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
+
+    role = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+    user = relationship("User", back_populates="messages")

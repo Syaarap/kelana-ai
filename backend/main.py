@@ -2,9 +2,10 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from database import SessionLocal, Base, engine
-from models import User, Trip
+from models import User, Trip, ChatMessage
 
 from schemas import (
     UserRegister,
@@ -21,7 +22,7 @@ from auth import (
     get_user_id_from_token,
 )
 
-from services.bedrock_service import generate_itinerary
+#from services.bedrock_service import generate_itinerary
 from services.trip_service import (
     get_trip_category,
     get_travel_season,
@@ -68,6 +69,9 @@ security = HTTPBearer(
     bearerFormat="JWT",
     description="Enter your JWT access token",
 )
+
+class ChatRequest(BaseModel):
+    message: str
 
 
 # =========================
@@ -388,3 +392,86 @@ def delete_trip(
     return {
         "message": "Trip deleted successfully"
     }
+
+@app.post("/api/v1/chat")
+def chat(
+    chat_request: ChatRequest,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id),
+):
+    # Ambil riwayat percakapan user
+    history = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.user_id == user_id)
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+
+    # Simpan pesan user
+    user_message = ChatMessage(
+        user_id=user_id,
+        role="user",
+        content=chat_request.message,
+    )
+
+    db.add(user_message)
+    db.commit()
+
+    # Susun conversation history
+    conversation = []
+
+    for message in history:
+        conversation.append(
+            f"{message.role}: {message.content}"
+        )
+
+    conversation.append(
+        f"user: {chat_request.message}"
+    )
+
+    prompt = "\n".join(conversation)
+
+    # Untuk sementara response sederhana.
+    # Nanti bagian ini kita sambungkan ke Bedrock.
+    ai_response = (
+        "Saya menerima pesanmu: "
+        + chat_request.message
+    )
+
+    # Simpan response AI
+    assistant_message = ChatMessage(
+        user_id=user_id,
+        role="assistant",
+        content=ai_response,
+    )
+
+    db.add(assistant_message)
+    db.commit()
+    db.refresh(assistant_message)
+
+    return {
+        "message": ai_response,
+        "created_at": assistant_message.created_at,
+    }
+
+@app.get("/api/v1/chat")
+def get_chat_history(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id),
+):
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.user_id == user_id)
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+
+    return [
+        {
+            "id": message.id,
+            "role": message.role,
+            "content": message.content,
+            "created_at": message.created_at,
+        }
+        for message in messages
+    ]
