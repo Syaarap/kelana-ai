@@ -1,0 +1,8 @@
+﻿[project]
+name = "kelana-ai"
+version = "0.1.0"
+description = "KelanaAI FastAPI backend"
+requires-python = ">=3.11"
+
+[tool.fastapi]
+entrypoint = "main:app"
